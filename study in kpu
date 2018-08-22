@@ -1,0 +1,39 @@
+
+cross - Entropy Error 
+
+또다른 오차를 계싼하는 수식 방법 
+
+p = 정답  
+q = 예측값
+
+=> -p(log(q)) # 아닌값을 제거하고 필요한 값만 사용 
+q = 100퍼선트면 0
+q의 정확도가 높아질수록 0에 수렴한다. 
+q = 작아 질수록 값이 커짐 
+
+
+08-22
+
+mnist 학습모델 구현 (deep neural network)
+ 5 fully-connected layers (more then 1 hidden layer = deep layer )
+
+1) sigmoid = hidden layers (1-4) // softmax = output layer (5)
+EX202
+
+slow start 현상 => sigmoid function은 vanishing gradient 문제를 발생 
+시그모이드 함수를 사용하면 역전법을 진행시 신경망이 깊을 수록 인풋 레이어 에 가면 기울기가 0에 가까워지는 현상 => 시그모이드 대신 RELU, PRELU를 사용해서 하면 이런 현상을 줄일 수있다.
+
+2) Relu = hidden layers (1-4) // softmax = output layer (5)
+EX205
+-- > slow start 문제 개선됨 
+but noist accuracy curve 발생 
+그래프를 확대해서 보면 accuracy 와 cross entropy loss 값이 변동 폭이 매우심함고 불안 
+---> learning rate가 크기 떼문에 줄여서 해결 
+
+3) Relu = hidden layers (1-4) // softmax = output layer (5) + Learning rate decay
+EX207
+
+>> learning_rate = 0.0001 + tf.train.exponential_decay(0.003, step, 2000, 1/math.e)
+이러한 모양으로 스탭 = 즉 수행 횟수에 따라서 값을 감소 하도록 설정하여 수행한다. 
+
+학습률 그래프보다 손실율 그래프를 보고 계산하는게 훨씬 정확성을 잘 파악할수 있다. 
