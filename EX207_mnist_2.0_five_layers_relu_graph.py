@@ -84,7 +84,7 @@ accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
 # training step, learning rate = 0.003
 
-step = 1
+step = tf.placeholder(tf.int32)
 learning_rate = 0.0001 + tf.train.exponential_decay(0.003, step, 2000, 1/math.e)
 train_step = tf.train.AdamOptimizer(learning_rate).minimize(cross_entropy)
 
@@ -99,7 +99,7 @@ test_acc_list = []
 train_loss_list = []
 test_loss_list = []
 # run
-for i in range(2000 + 1) :
+for i in range(10000 + 1) :
     batch_X, batch_Y = mnist.train.next_batch(100)
     a, c = sess.run([accuracy, cross_entropy], feed_dict={X : batch_X, Y_ : batch_Y, step: i} )
     print("training : ", i, ' accuracy = ', '{:7.4f}'.format(a), ' loss = ', c)
@@ -113,7 +113,7 @@ for i in range(2000 + 1) :
     test_acc_list.append(a)
     test_loss_list.append(c)
 
-    sess.run(train_step, feed_dict={X : batch_X, Y_ : batch_Y} )
+    sess.run(train_step, feed_dict={X : batch_X, Y_ : batch_Y, step: i} )
 
 # draw graph : accuracy
 x = np.arange(len(train_acc_list))

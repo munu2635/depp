@@ -19,6 +19,7 @@ import mnistdata
 print("Tensorflow version " + tf.__version__)
 import matplotlib.pyplot as plt
 import numpy as np
+import math
 
 tf.set_random_seed(0)
 
@@ -63,7 +64,7 @@ W5 = tf.Variable(tf.truncated_normal([O, 10], stddev=0.1))
 B5 = tf.Variable(tf.zeros([10]))
 
 # The model
-XX = tf.reshape(X, [-1, 784])
+XX = tf.reshape(X, [-1, 784])s
 Y1 = tf.nn.sigmoid(tf.matmul(XX, W1) + B1)
 Y2 = tf.nn.sigmoid(tf.matmul(Y1, W2) + B2)
 Y3 = tf.nn.sigmoid(tf.matmul(Y2, W3) + B3)
