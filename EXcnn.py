@@ -7,12 +7,12 @@ import numpy as np
 mnist = mnistdata.read_data_sets("data", one_hot=True, reshape=False)
 
 # 매개변수 W와 b를 초기화 
-K = 4
-L = 8
-M = 12 
+K = 6
+L = 12
+M = 24 
 N = 200 
 
-W1 = tf.Variable(tf.truncated_normal([5, 5, 1, K], stddev=0.1))
+W1 = tf.Variable(tf.truncated_normal([6, 6, 1, K], stddev=0.1))
 B1 = tf.Variable(tf.ones([K])/10)
 W2 = tf.Variable(tf.truncated_normal([5, 5, K, L], stddev=0.1))
 B2 = tf.Variable(tf.ones([L])/10)
@@ -28,21 +28,24 @@ B5 = tf.Variable(tf.ones([10])/10)
 # 학습 데이터를 주입할 place holder를 정의  
 X = tf.placeholder(tf.float32, [None, 28, 28, 1])
 Y_ = tf.placeholder(tf.float32, [None, 10])
-
+pkeep = tf.placeholder(tf.float32)
 step = tf.placeholder(tf.int32)
-
 # cnn 모델 정의 
 stride = 1
 Y1 = tf.nn.relu(tf.nn.conv2d(X, W1, strides=[1, stride, stride, 1], padding='SAME') + B1)
+Y1d = tf.nn.dropout(Y1, pkeep)
 stride = 2
-Y2 = tf.nn.relu(tf.nn.conv2d(Y1, W2, strides=[1, stride, stride, 1], padding='SAME') + B2)
+Y2 = tf.nn.relu(tf.nn.conv2d(Y1d, W2, strides=[1, stride, stride, 1], padding='SAME') + B2)
+Y2d = tf.nn.dropout(Y2, pkeep)
 stride = 2
-Y3 = tf.nn.relu(tf.nn.conv2d(Y2, W3, strides=[1, stride, stride, 1], padding='SAME') + B3)
+Y3 = tf.nn.relu(tf.nn.conv2d(Y2d, W3, strides=[1, stride, stride, 1], padding='SAME') + B3)
+Y3d = tf.nn.dropout(Y3, pkeep)
 
-YY = tf.reshape(Y3, shape=[-1, 7 * 7 * M])
-
+YY = tf.reshape(Y3d, shape=[-1, 7 * 7 * M])
 Y4 = tf.nn.relu(tf.matmul(YY, W4) + B4)
-Ylogits = tf.matmul(Y4, W5) + B5
+Y4d = tf.nn.dropout(Y4, pkeep)
+
+Ylogits = tf.matmul(Y4d, W5) + B5
 Y = tf.nn.softmax(Ylogits)
 
 # 손실함수 정의 
@@ -67,9 +70,11 @@ test_acc_list = []
 train_loss_list = []
 test_loss_list = []
 
-for i in range(2000+1):
+for i in range(10000+1):
+	# 샘플링 
 	batch_X, batch_Y = mnist.train.next_batch(100)
-	a, c = sess.run([accuracy, cross_entropy], feed_dict={X: batch_X, Y_:batch_Y, step: i})
+	# train 정확도
+	a, c = sess.run([accuracy, cross_entropy], feed_dict={X: batch_X, Y_:batch_Y, pkeep: 1.0, step: i})
 	print("training: ", i, a, c)
 
 	if i % 10 == 0:
@@ -77,11 +82,13 @@ for i in range(2000+1):
 		train_loss_list.append(c)
 
 	if i % 10 == 0:
-		a, c = sess.run([accuracy, cross_entropy], feed_dict={X: mnist.test.images, Y_:mnist.test.labels})
+		#test 정확도 
+		a, c = sess.run([accuracy, cross_entropy], feed_dict={X: mnist.test.images, Y_:mnist.test.labels, pkeep: 1.0})
 		test_acc_list.append(a)
 		test_loss_list.append(c)
 
-	sess.run(train_step, {X: batch_X, Y_: batch_Y, step: i})
+	# 학습 
+	sess.run(train_step, {X: batch_X, Y_: batch_Y, pkeep: 0.75, step: i})
 
 # draw graph : accuracy
 x = np.arange(len(train_acc_list))
