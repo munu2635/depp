@@ -31,7 +31,7 @@ Y_ = tf.placeholder(tf.float32, [None, 10])
 pkeep = tf.placeholder(tf.float32)
 step = tf.placeholder(tf.int32)
 # cnn 모델 정의 
-stride = 1
+stride = 1 # padding을 SAME으로 줘서 필터 크기를 맞춰주었당
 Y1 = tf.nn.relu(tf.nn.conv2d(X, W1, strides=[1, stride, stride, 1], padding='SAME') + B1)
 Y1d = tf.nn.dropout(Y1, pkeep)
 stride = 2
@@ -60,6 +60,14 @@ accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 learning_rate = 0.001 + tf.train.exponential_decay(0.003, step, 2000, 1/math.e)
 train_step = tf.train.AdamOptimizer(learning_rate).minimize(cross_entropy)
 
+tf.summary.scalar("loss", cross_entropy)
+tf.summary.scalar("accuracy", accuracy)
+
+merged_summary_op = tf.summary.merge_all()
+summary_writer = tf.summary.FileWriter('./logs', graph=tf.get_default_graph())
+
+
+
 #sess 객체 생성 및 변수 초기화 
 init = tf.global_variables_initializer()
 sess = tf.Session()
@@ -70,12 +78,14 @@ test_acc_list = []
 train_loss_list = []
 test_loss_list = []
 
-for i in range(10000+1):
+for i in range(2000+1):
 	# 샘플링 
 	batch_X, batch_Y = mnist.train.next_batch(100)
 	# train 정확도
-	a, c = sess.run([accuracy, cross_entropy], feed_dict={X: batch_X, Y_:batch_Y, pkeep: 1.0, step: i})
+	a, c, summary= sess.run([accuracy, cross_entropy, merged_summary_op], feed_dict={X: batch_X, Y_:batch_Y, pkeep: 1.0, step: i})
 	print("training: ", i, a, c)
+
+	summary_writer.add_summary(summary, i)
 
 	if i % 10 == 0:
 		train_acc_list.append(a)
@@ -83,9 +93,10 @@ for i in range(10000+1):
 
 	if i % 10 == 0:
 		#test 정확도 
-		a, c = sess.run([accuracy, cross_entropy], feed_dict={X: mnist.test.images, Y_:mnist.test.labels, pkeep: 1.0})
+		a, c, summary = sess.run([accuracy, cross_entropy, merged_summary_op], feed_dict={X: mnist.test.images, Y_:mnist.test.labels, pkeep: 1.0})
 		test_acc_list.append(a)
 		test_loss_list.append(c)
+		summary_writer.add_summary(summary, i)
 
 	# 학습 
 	sess.run(train_step, {X: batch_X, Y_: batch_Y, pkeep: 0.75, step: i})
