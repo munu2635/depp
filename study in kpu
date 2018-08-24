@@ -157,8 +157,26 @@ cnn 구조변경 필터크기와 채널갯수를 조정하여 cnn구조를 전�
 dropout 구현 
 
 4) Tensorboard 
+ log 값으로 데이터 저장 
+---------------------------------------
+tf.summary.scaler("loss", loss)
+tf.summary.scaler("accuracy", accuracy)
+metged_summary_op = tf.summary.merge_all()
+summary_writer = tf.summary.FileWriter('./log', graph:tf.get_default_graph)
+----------------------------------------
+ Tensorboard 실행및 접속 
+ 실행 : tensorboard --logdir=./logs (default port = 6006)
+ 		tensorboard --logdir=./logs --port=8088
+
+ 접속 : http://localhost:6006 (or 지정 port 값)
 
 5) 주요 CNN 모델 
+ ImageNet Challenge 
+ 	LeNet-5 (1998)
+ 	AlexNet (2012)
+ 	googleNet/Inception(2014)
+ 	VGGNet (2014)
+ 	ResNet (2015)
 
 6) 딥러닝 기술과 응용 분야
 	CNN based Detection 
