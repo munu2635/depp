@@ -136,10 +136,12 @@ OH = (H + 2P - FH)/S + 1  || OW = (H + 2P - FW)/S + 1  -- 주의 OH, OW는 원�
 ex 28x28x4 => 3000 -> 14x14x8 => 1500 -> 7x7x12 => 500 -> 200 --softmax--> 10 
 	 4개의 특징을 구함  8개의 특징을 구함   12개의 특징을 구함 
 
+
+conv2d 함수의 샬먕을 찾아본당 
 필터크기와 채널 갯수를 조정하여 설계 
 
 2-#) 가중치 vs 하이퍼파라미터 
-- 가중치 weight & 편향 bias == 딥러닝 ㅇ알고리즘에 의해 자동으로 최적화
+- 가중치 weight & 편향 bias == 딥러닝 알고리즘에 의해 자동으로 최적화
  딥러닝 알고리즘 (SGD)에 의해 자동적으로 최적값이 결정됨 
  딥러닝 알고리즘이 학습데이터로 부터 최적 가중치값을 자동으로 계산함
 
@@ -148,3 +150,54 @@ ex 28x28x4 => 3000 -> 14x14x8 => 1500 -> 7x7x12 => 500 -> 200 --softmax--> 10
  cnn 에서는 필터크기, 채널개수도 하이퍼 파라미터 
  딥러닝 개발자가 최적값을 수동으로 선택해야함 
 
+08-24 last-day
+
+3) Bigger CNN 구현 - 실습한 내용에 대해서 설명
+cnn 구조변경 필터크기와 채널갯수를 조정하여 cnn구조를 전체적으로 변경  layer 1 -> 28x28x6
+dropout 구현 
+
+4) Tensorboard 
+
+5) 주요 CNN 모델 
+
+6) 딥러닝 기술과 응용 분야
+	CNN based Detection 
+	1 - Image Classification (CNN)
+	2 - object Detection (Faster RCNN, SSD, YOLO)
+	3 - Instance Segmentation (Mask RCNN)
+	4 - 자연어 처리 (RNN, LSTM)
+	5 - 이미지 생성 (GAN)
+	6 - Reinforcement Learning (DQN, policy Gradient)
+
++-1) Epoch vs Iteration 
+
+1 Epoch 		모든 데이터 셋을 한 번 학습 
+1 iteration 	1회 학습 
+minibatch 		데이터 셋을 batch size크기로 쪼개서 학습 
+--------------------------------------------
+ex) 총 데이터가 100개, batch size가 10 이면 
+1 iteration = 10개 데이터에 대해서 학습 
+1 Epoch 	= 100/batch size = 10 iteration
+--------------------------------------------
+
++-2) 데이터 셋 분할 방법
+학습 데이터와 시험 데이터로 분할하는 방법 
+  - 학습데이터 : 매개 변수 학습에 이용 
+  - 검증데이터 : 하이퍼파리미터 최적값을 찾는데 이용 
+  - 시험데이터 : 학습모댈이 학습데이터에 오버피팅 여부 혹은 성능이 어느정도인지 평가하는 용도 
+
+
++-3)Activation Function 선택 
+- 분류(classificaion) vs 회귀(regression)  ++++ 군집화(clustering), 연관성분석(association)
+ 	분류 = 데이터가 어느 클래스에 속하는지를 판단하는 기법
+ 	회귀 = 데이터들로 부터 일정한 패턴을 찾은 후 예측하는 기법 
+
+- 출력층의 활성화 함수 선택
+	2 클래스 분류 문제 	: Sigmoid 사용 
+	다중클래스 분류 문제 	: Softmax 사용 
+	회귀 문제 			: Output 그대로 사용 
+
+참고교재 
+deep-Learning from scratch
+Fensorflow and deep learning :
+https://github.com/GoogleCloudPlatform/tensorflow-without-a-phd/tree/master/tensorflow-mnist-tutorial
